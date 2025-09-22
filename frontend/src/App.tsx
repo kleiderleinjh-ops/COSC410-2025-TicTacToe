@@ -1,15 +1,5 @@
 import TicTacToe from "@/components/TicTacToe";
 
 export default function App() {
-  return (<div className="grid grid-col3 gap-2">
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  <TicTacToe />
-  </div>)
+  return <TicTacToe />;
 }
