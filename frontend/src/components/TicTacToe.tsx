@@ -7,7 +7,6 @@ type Props = {
   onWin?: (winner: Player | "draw" | null) => void;
 };
 
-// ----- Backend DTOs -----
 type GameStateDTO = {
   id: string;
   board: Cell[];
@@ -17,19 +16,15 @@ type GameStateDTO = {
   status: string;
 };
 
-// Prefer env, fallback to localhost:8000
 const API_BASE =
   (import.meta as any)?.env?.VITE_API_URL?.replace(/\/$/, "") ??
   "http://localhost:8000";
-
-
 
 export default function TicTacToe({ onWin }: Props) {
   const [state, setState] = React.useState<GameStateDTO | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Create a new game on mount
   React.useEffect(() => {
     let canceled = false;
     async function start() {
@@ -50,7 +45,6 @@ export default function TicTacToe({ onWin }: Props) {
     };
   }, []);
 
-  // Notify parent when result changes
   React.useEffect(() => {
     if (!state || !onWin) return;
     if (state.winner) onWin(state.winner);
@@ -83,7 +77,6 @@ export default function TicTacToe({ onWin }: Props) {
 
   async function handleClick(i: number) {
     if (!state || loading) return;
-    // Light client-side guard to avoid noisy 400s:
     if (state.winner || state.is_draw || state.board[i] !== null) return;
 
     setLoading(true);
@@ -98,61 +91,48 @@ export default function TicTacToe({ onWin }: Props) {
     }
   }
 
-  async function reset() {
-    setLoading(true);
-    setError(null);
-    try {
-      const gs = await createGame();
-      setState(gs);
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to reset");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   if (error) {
     return (
-      <div className="max-w-sm mx-auto p-4">
+      <div className="max-w-sm mx-auto p-2">
         <div className="mb-2 text-red-600 font-semibold">Error: {error}</div>
-        <button className="rounded-2xl px-4 py-2 border" onClick={reset}>
-          Retry
-        </button>
       </div>
     );
   }
 
   if (!state) {
     return (
-      <div className="max-w-sm mx-auto p-4">
+      <div className="max-w-sm mx-auto p-2">
         <div className="text-center">Loading…</div>
       </div>
     );
   }
 
-  const { board, status } = state;
+  const { board } = state;
 
+  // Only render the grid, no status, no New Game button
   return (
-    <div className="max-w-sm mx-auto p-4">
-      <div className="text-center mb-2 text-xl font-semibold">{status}</div>
+    <div className="max-w-sm mx-auto p-2">
       <div className="grid grid-cols-3 gap-2">
         {board.map((c, i) => (
           <button
             key={i}
-            className="aspect-square rounded-2xl border text-3xl font-bold flex items-center justify-center disabled:opacity-50"
+            className="aspect-square rounded-xl border-2 border-gray-400 text-3xl font-bold flex items-center justify-center bg-white hover:bg-gray-100 transition-all"
             onClick={() => handleClick(i)}
             aria-label={`cell-${i}`}
             disabled={loading || c !== null || state.winner !== null || state.is_draw}
+            style={{
+              minWidth: 0,
+              minHeight: 0,
+              padding: 0,
+              width: "100%",
+              height: "100%",
+            }}
           >
             {c}
           </button>
         ))}
       </div>
-      <div className="text-center mt-3">
-        <button className="rounded-2xl px-4 py-2 border" onClick={reset} disabled={loading}>
-          New Game
-        </button>
-      </div>
     </div>
   );
 }
+
