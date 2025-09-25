@@ -93,7 +93,7 @@ export default function TicTacToe({ onWin }: Props) {
 
   if (error) {
     return (
-      <div className="max-w-sm mx-auto p-2">
+      <div className="w-full h-full flex items-center justify-center">
         <div className="mb-2 text-red-600 font-semibold">Error: {error}</div>
       </div>
     );
@@ -101,31 +101,47 @@ export default function TicTacToe({ onWin }: Props) {
 
   if (!state) {
     return (
-      <div className="max-w-sm mx-auto p-2">
+      <div className="w-full h-full flex items-center justify-center">
         <div className="text-center">Loading…</div>
+      </div>
+    );
+  }
+
+  // Show a giant X/O when won, or "Draw" if drawn
+  if (state.winner) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <span className="text-[6rem] font-extrabold text-gray-900">{state.winner}</span>
+      </div>
+    );
+  }
+  if (state.is_draw) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <span className="text-5xl font-extrabold text-gray-400">Draw</span>
       </div>
     );
   }
 
   const { board } = state;
 
-  // Only render the grid, no status, no New Game button
+  // Normal grid rendering
   return (
-    <div className="max-w-sm mx-auto p-2">
-      <div className="grid grid-cols-3 gap-2">
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="grid grid-cols-3 gap-0 w-full h-full">
         {board.map((c, i) => (
           <button
             key={i}
-            className="aspect-square rounded-xl border-2 border-gray-400 text-3xl font-bold flex items-center justify-center bg-white hover:bg-gray-100 transition-all"
+            className="aspect-square border-2 border-black text-3xl font-bold flex items-center justify-center bg-white"
             onClick={() => handleClick(i)}
             aria-label={`cell-${i}`}
             disabled={loading || c !== null || state.winner !== null || state.is_draw}
             style={{
               minWidth: 0,
               minHeight: 0,
-              padding: 0,
               width: "100%",
               height: "100%",
+              padding: 0,
             }}
           >
             {c}
@@ -135,4 +151,3 @@ export default function TicTacToe({ onWin }: Props) {
     </div>
   );
 }
-
